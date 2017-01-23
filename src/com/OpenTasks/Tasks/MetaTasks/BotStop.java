@@ -48,7 +48,7 @@ public class BotStop extends Task {
       Logger.error("*execute* has thrown an exception.", e);
     }
 
-    Environment.getScript().stop();
+    Environment.getBot().stop();
   }
 
   // TODO: Hide addChild method.

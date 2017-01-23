@@ -1,16 +1,20 @@
 package com.OpenTasks;
 
+import com.runemate.game.api.hybrid.Environment;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringJoiner;
 
 /**
  * Created by VTM on 4/7/2016.
  */
 public class Logger {
 
+  /* ENUMS */
   public enum LEVEL {
-    DEBUG(10), INFO(20), WARNING(30), ERROR(40), CRITICAL(50);
+    All(0), DEBUG(10), INFO(20), WARNING(30), ERROR(40), CRITICAL(50), DISABLED(60);
 
     public final int level;
 
@@ -19,24 +23,60 @@ public class Logger {
     }
   }
 
-  public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+  /* FIELDS */
+
+  public LEVEL level;
+
+  /* METHODS */
+
+  public Logger(LEVEL level) {
+    this.level = level;
+  }
+
+  public Logger() {
+    this(LEVEL.INFO);
+  }
+
+  public static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
   private static void _log(LEVEL level, String message, Exception exception) {
-    // Get current timestamp
+    if (!_shouldPrint(level)) return;
+
+    _log(level, message, exception, 4);
+  }
+
+  private static void _log(LEVEL level, Exception exception, String format, Object... args) {
+    if (!_shouldPrint(level)) return;
+
+    String message = String.format(format, args);
+    _log(level, message, exception, 4);
+  }
+
+  private static void _log(LEVEL level, String message, Exception exception, int stackTraceIndex) {
+    // 1. Get current timestamp
     String timestamp = dateFormat.format(new Date());
 
-    // Get caller method name
+    // 2. Get caller method name and class
     StackTraceElement[] stacktrace = Thread.currentThread().getStackTrace();
-    StackTraceElement e = stacktrace[3];
+    StackTraceElement e = stacktrace[stackTraceIndex];
     String className = e.getClassName();
     String methodName = e.getMethodName();
 
-    // Print out
-    System.out.println(String.format("%s %s %s", timestamp, className, methodName));
+    // 3. Print out
+    System.out.println(String.format("%s %s:%s", timestamp, className, methodName));
     System.out.println(String.format("[%s] %s", level.name(), message));
     if (exception != null) {
       exception.printStackTrace();
     }
+  }
+
+  private static boolean _shouldPrint(LEVEL level) {
+    // Check if level is high enough to print
+    return level.ordinal() > _getLevel().ordinal();
+  }
+
+  private static LEVEL _getLevel() {
+    return TaskBot.GetInstance().getLogger().level;
   }
 
   /* LOG */
@@ -45,8 +85,7 @@ public class Logger {
   }
 
   public static void log(LEVEL level, String format, Object... args) {
-    String message = String.format(format, args);
-    _log(level, message, null);
+    _log(level, null, format, args);
   }
 
   public static void log(LEVEL level, String message, Exception e) {
@@ -54,8 +93,7 @@ public class Logger {
   }
 
   public static void log(LEVEL level, Exception e, String format, Object... args) {
-    String message = String.format(format, args);
-    _log(level, message, e);
+    _log(level, e, format, args);
   }
 
   /* DEBUG */
@@ -64,8 +102,7 @@ public class Logger {
   }
 
   public static void debug(String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.DEBUG, message, null);
+    _log(LEVEL.DEBUG, null, format, args);
   }
 
   /* INFO */
@@ -74,8 +111,7 @@ public class Logger {
   }
 
   public static void info(String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.INFO, message, null);
+    _log(LEVEL.INFO, null, format, args);
   }
 
   /* WARNING */
@@ -84,8 +120,7 @@ public class Logger {
   }
 
   public static void warning(String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.WARNING, message, null);
+    _log(LEVEL.WARNING, null, format, args);
   }
 
   /* ERROR */
@@ -94,8 +129,7 @@ public class Logger {
   }
 
   public static void error(String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.ERROR, message, null);
+    _log(LEVEL.ERROR, null, format, args);
   }
 
   public static void error(String message, Exception e) {
@@ -103,8 +137,7 @@ public class Logger {
   }
 
   public static void error(Exception e, String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.ERROR, message, e);
+    _log(LEVEL.ERROR, e, format, args);
   }
 
   /* CRITICAL */
@@ -113,8 +146,7 @@ public class Logger {
   }
 
   public static void critical(String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.CRITICAL, message, null);
+    _log(LEVEL.CRITICAL, null, format, args);
   }
 
   public static void critical(String message, Exception e) {
@@ -122,7 +154,6 @@ public class Logger {
   }
 
   public static void critical(Exception e, String format, Object... args) {
-    String message = String.format(format, args);
-    _log(LEVEL.CRITICAL, message, e);
+    _log(LEVEL.CRITICAL, e, format, args);
   }
 }

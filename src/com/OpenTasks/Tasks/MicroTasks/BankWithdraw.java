@@ -13,8 +13,12 @@ import java.util.function.Predicate;
  */
 public class BankWithdraw <T> extends Task {
 
+  /* FIELDS */
+
   private T parameter;
   private int quantity;
+
+  /* METHODS */
 
   private BankWithdraw(int priority, T parameter, int quantity) {
     super("BankWithdraw", priority);

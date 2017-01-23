@@ -13,7 +13,7 @@ public class MagicActivate<T> extends Task {
   private T magic;
   private int ableToCastTextureID;
 
-  private MagicActivate(int priority, T magic, int ableToCastTextureID) {
+  protected MagicActivate(int priority, T magic, int ableToCastTextureID) {
     super("MagicActivate", priority);
     this.magic = magic;
     this.ableToCastTextureID = ableToCastTextureID;
@@ -33,21 +33,7 @@ public class MagicActivate<T> extends Task {
 
   @Override
   public boolean validate() {
-    // 1. Magic interface window must be open
-    boolean isMagicInterfaceWindowOpen = InterfaceWindows.getMagic().isOpen();
-
-    // 2. Has the right book
-    boolean isBookGood = false;
-
-    if (magic instanceof Magic) {
-      isBookGood = Magic.Book.getCurrent() == Magic.Book.STANDARD;
-    } else if (magic instanceof Magic.Ancient) {
-      isBookGood = Magic.Book.getCurrent() == Magic.Book.ANCIENT;
-    } else if (magic instanceof Magic.Lunar) {
-      isBookGood = Magic.Book.getCurrent() == Magic.Book.LUNAR;
-    }
-
-    // 3. Is not selected already
+    // 1. Is not selected already
     boolean isMagicNotSelected = false;
 
     if (magic instanceof Magic) {
@@ -58,29 +44,27 @@ public class MagicActivate<T> extends Task {
       isMagicNotSelected = ((Magic.Lunar) magic).isSelected();
     }
 
-    // 4. Is able to cast magic
+    // 2. Is able to cast magic
     boolean isAbleToCastMagic = false;
 
     if (magic instanceof Magic) {
-      isAbleToCastMagic = ((Magic) magic).getComponent().getTextureId() == ableToCastTextureID;
+      isAbleToCastMagic = ((Magic) magic).getComponent().getSpriteId() == ableToCastTextureID;
     } else if (magic instanceof Magic.Ancient) {
-      isAbleToCastMagic = ((Magic.Ancient) magic).getComponent().getTextureId() == ableToCastTextureID;
+      isAbleToCastMagic = ((Magic.Ancient) magic).getComponent().getSpriteId() == ableToCastTextureID;
     } else if (magic instanceof Magic.Lunar) {
-      isAbleToCastMagic = ((Magic.Lunar) magic).getComponent().getTextureId() == ableToCastTextureID;
+      isAbleToCastMagic = ((Magic.Lunar) magic).getComponent().getSpriteId() == ableToCastTextureID;
     }
 
-    Logger.debug("isMagicInterfaceWindowOpen: %b, isBookGood: %b, isMagicNotSelected: %b, isAbleToCastMagic: %b",
-        isMagicInterfaceWindowOpen, isBookGood, isMagicNotSelected, isAbleToCastMagic);
+    Logger.debug("isMagicNotSelected: %b, isAbleToCastMagic: %b",
+        isMagicNotSelected, isAbleToCastMagic);
 
-    return isMagicInterfaceWindowOpen
-      && isBookGood
-      && isMagicNotSelected
+    return isMagicNotSelected
       && isAbleToCastMagic;
   }
 
   @Override
   public void execute() {
-    Logger.debug("Activating magic...");
+    Logger.debug("Activating magic.");
 
     if (magic instanceof Magic) {
       ((Magic) magic).activate();

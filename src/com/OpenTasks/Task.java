@@ -8,13 +8,17 @@ import java.util.List;
  */
 public abstract class Task {
 
+  /* FIELDS */
+
   private Task parent;
-  private List<Task> children;
+  protected List<Task> children;
 
   public final String name;
   public final int priority;
 
-  private Task lastTaskExecuted;
+  private Task lastChildTaskExecuted;
+
+  /* METHODS */
 
   public Task(String name, int priority) {
     this.name = name;
@@ -30,38 +34,33 @@ public abstract class Task {
     if (children.isEmpty()) return;
 
     // First execution
-    boolean isFirstExec = lastTaskExecuted == null;
+    boolean isFirstExec = lastChildTaskExecuted == null;
     if (isFirstExec) {
-      lastTaskExecuted = children.get(0);
+      lastChildTaskExecuted = children.get(0);
     }
 
     // First try to run the last task executed
-    if (lastTaskExecuted.validate()) {
-      if (isFirstExec) lastTaskExecuted.begin();
-      lastTaskExecuted.execute();
+    if (lastChildTaskExecuted.validate()) {
+      if (isFirstExec) lastChildTaskExecuted.begin();
+      lastChildTaskExecuted.execute();
       return;
     } else if (!isFirstExec){
-      lastTaskExecuted.end();
+      lastChildTaskExecuted.end();
     }
 
     // Secondly try to execute the others tasks in order
-    int indefOfLastTaskExecuted = children.indexOf(lastTaskExecuted);
+    int indefOfLastTaskExecuted = children.indexOf(lastChildTaskExecuted);
     int nChildren = children.size();
 
     for (int i = (indefOfLastTaskExecuted + 1) % nChildren; i != indefOfLastTaskExecuted; i = (i + 1) % nChildren) {
       Task ti = children.get(i);
       if (ti.validate()) {
-        lastTaskExecuted = ti;
-        lastTaskExecuted.begin();
+        lastChildTaskExecuted = ti;
+        lastChildTaskExecuted.begin();
         ti.execute();
         return;
       }
     }
-  }
-
-  public void configure(Object config) {
-    // Config children
-    for (Task child : children) child.configure(config);
   }
 
   public void begin() {
@@ -72,24 +71,9 @@ public abstract class Task {
 
   }
 
-  public void OnStart() {
-    // Start children
-    for (Task child : children) child.OnStart();
-  }
-
-  public void OnStop() {
-    // Stop children
-    for (Task child : children) child.OnStop();
-  }
-
-  public void OnPause() {
-    // Stop children
-    for (Task child : children) child.OnPause();
-  }
-
-  public void OnResume() {
-    // Stop children
-    for (Task child : children) child.OnResume();
+  public void configure(Object config) {
+    // Config children
+    for (Task child : children) child.configure(config);
   }
 
   public void addChild(Task child) {
@@ -109,8 +93,8 @@ public abstract class Task {
       throw new RuntimeException("I'm not your father Task. (The task you are trying to remove is not a child of this task)");
     }
 
-    if (lastTaskExecuted == child) {
-      lastTaskExecuted = null;
+    if (lastChildTaskExecuted == child) {
+      lastChildTaskExecuted = null;
     }
 
     children.remove(child);
@@ -122,7 +106,7 @@ public abstract class Task {
       child.setParent(null);
     }
 
-    lastTaskExecuted = null;
+    lastChildTaskExecuted = null;
     children.clear();
   }
 
@@ -134,9 +118,12 @@ public abstract class Task {
     this.parent = parent;
   }
 
-  public Task getLastTaskExecuted() {
-    return lastTaskExecuted;
+  public List<Task> getChildren() {
+    return children;
   }
 
+  public Task getLastChildTaskExecuted() {
+    return lastChildTaskExecuted;
+  }
 
 }
