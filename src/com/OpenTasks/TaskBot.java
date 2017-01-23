@@ -5,7 +5,6 @@ import com.OpenTasks.EventBus.EventDispatcher;
 import com.OpenTasks.EventBus.Events.*;
 import com.runemate.game.api.hybrid.Environment;
 import com.runemate.game.api.hybrid.util.StopWatch;
-import com.runemate.game.api.hybrid.util.StringFormat;
 import com.runemate.game.api.script.framework.LoopingBot;
 
 /**

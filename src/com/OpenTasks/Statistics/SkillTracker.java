@@ -7,7 +7,6 @@ import com.OpenTasks.EventBus.Events.StartTasksEvent;
 import com.OpenTasks.EventBus.Events.StopTasksEvent;
 import com.runemate.game.api.hybrid.local.Skill;
 import com.runemate.game.api.hybrid.util.StopWatch;
-import com.runemate.game.api.script.framework.listeners.SkillListener;
 import com.runemate.game.api.script.framework.listeners.events.SkillEvent;
 
 import java.time.Duration;

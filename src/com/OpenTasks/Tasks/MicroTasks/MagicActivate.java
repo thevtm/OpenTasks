@@ -2,7 +2,6 @@ package com.OpenTasks.Tasks.MicroTasks;
 
 import com.OpenTasks.Logger;
 import com.OpenTasks.Task;
-import com.runemate.game.api.hybrid.local.hud.interfaces.InterfaceWindows;
 import com.runemate.game.api.osrs.local.hud.interfaces.Magic;
 
 /**

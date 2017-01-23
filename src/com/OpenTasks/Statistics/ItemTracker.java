@@ -2,12 +2,10 @@ package com.OpenTasks.Statistics;
 
 import com.OpenTasks.EventBus.Broadcaster.Events.ItemAddedEvent;
 import com.OpenTasks.EventBus.Broadcaster.Events.ItemRemovedEvent;
-import com.OpenTasks.EventBus.EventDispatcher;
 import com.OpenTasks.EventBus.EventHandler;
 import com.OpenTasks.EventBus.Events.StartTasksEvent;
 import com.OpenTasks.EventBus.Events.StopTasksEvent;
 import com.runemate.game.api.hybrid.util.StopWatch;
-import com.runemate.game.api.script.framework.listeners.InventoryListener;
 import com.runemate.game.api.script.framework.listeners.events.ItemEvent;
 
 import java.util.function.Predicate;
