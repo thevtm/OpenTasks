@@ -30,16 +30,16 @@ public abstract class Task {
   public abstract boolean validate();
 
   public void execute() {
-    // No child case
+    // 1. No child case
     if (children.isEmpty()) return;
 
-    // First execution
+    // 2. First execution
     boolean isFirstExec = lastChildTaskExecuted == null;
     if (isFirstExec) {
       lastChildTaskExecuted = children.get(0);
     }
 
-    // First try to run the last task executed
+    // 3. First try to run the last task executed
     if (lastChildTaskExecuted.validate()) {
       if (isFirstExec) lastChildTaskExecuted.begin();
       lastChildTaskExecuted.execute();
@@ -48,11 +48,11 @@ public abstract class Task {
       lastChildTaskExecuted.end();
     }
 
-    // Secondly try to execute the others tasks in order
-    int indefOfLastTaskExecuted = children.indexOf(lastChildTaskExecuted);
+    // 4. Secondly try to execute the others tasks in order
+    int indexOfLastTaskExecuted = children.indexOf(lastChildTaskExecuted);
     int nChildren = children.size();
 
-    for (int i = (indefOfLastTaskExecuted + 1) % nChildren; i != indefOfLastTaskExecuted; i = (i + 1) % nChildren) {
+    for (int i = (indexOfLastTaskExecuted + 1) % nChildren; i != indexOfLastTaskExecuted; i = (i + 1) % nChildren) {
       Task ti = children.get(i);
       if (ti.validate()) {
         lastChildTaskExecuted = ti;

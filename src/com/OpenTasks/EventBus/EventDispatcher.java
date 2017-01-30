@@ -117,6 +117,9 @@ public class EventDispatcher {
   private Map<Class<?>, Class<?>> eventToBroadcaster =  new HashMap<>();
   EventBroadcasterManager broadcasterManager = new EventBroadcasterManager();
 
+  // HACK: necessary for RuneMate to import some classes.
+  private static final Dummy __dummy__ = new Dummy();
+
 
   /* METHODS */
 
@@ -230,5 +233,6 @@ public class EventDispatcher {
       handlers.remove(event.getClass());
     }
   }
+
 }
 

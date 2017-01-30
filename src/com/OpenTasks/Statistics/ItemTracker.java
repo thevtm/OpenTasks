@@ -13,25 +13,26 @@ import java.util.function.Predicate;
 /**
  * Created by VTM on 12/7/2016.
  */
-public class ItemTracker {
+public class ItemTracker extends StatisticsTracker {
 
   /* FIELDS */
 
   private Predicate<ItemEvent> predicate;
   private int total;
-  private StopWatch stopWatch;
 
   /* METHODS */
 
   public ItemTracker(Predicate<ItemEvent> predicate) {
-    this.predicate = predicate;
+    super();
 
+    this.predicate = predicate;
     total = 0;
-    stopWatch = new StopWatch();
   }
 
   @EventHandler
   public void onItemAdded(ItemAddedEvent itemAddedEvent) {
+    if (!isRunning()) return;
+
     ItemEvent itemEvent = itemAddedEvent.event;
 
     if (!predicate.test(itemEvent)) return;
@@ -41,6 +42,8 @@ public class ItemTracker {
 
   @EventHandler
   public void onItemRemoved(ItemRemovedEvent itemRemovedEvent) {
+    if (!isRunning()) return;
+
     ItemEvent itemEvent = itemRemovedEvent.event;
 
     if (!predicate.test(itemEvent)) return;
@@ -48,21 +51,10 @@ public class ItemTracker {
     total -= itemEvent.getQuantityChange();
   }
 
-  public void start() {
-    stopWatch.start();
-  }
-
-  public void stop() {
-    stopWatch.stop();
-  }
-
+  @Override
   public void reset() {
-    stopWatch.reset();
+    super.reset();
     total = 0;
-  }
-
-  public long getRunningTime() {
-    return stopWatch.getRuntime();
   }
 
   public int getTotal() {
@@ -73,11 +65,4 @@ public class ItemTracker {
     return (int) ((getTotal() * 3600000D) / getRunningTime());
   }
 
-  @EventHandler
-  public void StartTasksEventHandler(StartTasksEvent event) {
-    start();
-  }
-
-  @EventHandler
-  public void StopTasksEventHandler(StopTasksEvent event) { stop(); }
 }

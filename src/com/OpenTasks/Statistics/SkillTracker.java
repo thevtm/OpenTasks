@@ -16,14 +16,13 @@ import java.time.format.DateTimeFormatter;
 /**
  * Created by VTM on 10/7/2016.
  */
-public class SkillTracker {
+public class SkillTracker extends StatisticsTracker {
 
   /* FIELDS */
 
   private Skill skill;
   private int levelsGained;
   private int expGained;
-  private StopWatch stopWatch;
 
   /* METHODS */
 
@@ -32,11 +31,12 @@ public class SkillTracker {
 
     levelsGained = 0;
     expGained = 0;
-    stopWatch = new StopWatch();
   }
 
   @EventHandler
   public void onLevelUp(LevelUpEvent levelUpEvent) {
+    if (!isRunning()) return;
+
     SkillEvent skillEvent = levelUpEvent.event;
 
     if (skillEvent.getSkill() != skill)
@@ -47,6 +47,8 @@ public class SkillTracker {
 
   @EventHandler
   public void onExperienceGained(ExperienceGainedEvent experienceGainedEvent) {
+    if (!isRunning()) return;
+
     SkillEvent skillEvent = experienceGainedEvent.event;
 
     if (skillEvent.getSkill() != skill)
@@ -55,23 +57,12 @@ public class SkillTracker {
     expGained += skillEvent.getChange();
   }
 
-  public void start() {
-    stopWatch.start();
-  }
-
-  public void stop() {
-    stopWatch.stop();
-  }
-
+  @Override
   public void reset() {
-    stopWatch.reset();
+    super.reset();
 
     expGained = 0;
     levelsGained = 0;
-  }
-
-  public long getRunningTime() {
-    return stopWatch.getRuntime();
   }
 
   public int getLevelsGained() {
@@ -108,11 +99,4 @@ public class SkillTracker {
     return DateTimeFormatter.ofPattern(pattern).format(t);
   }
 
-  @EventHandler
-  public void StartTasksEventHandler(StartTasksEvent event) {
-    start();
-  }
-
-  @EventHandler
-  public void StopTasksEventHandler(StopTasksEvent event) { stop(); }
 }

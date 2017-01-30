@@ -16,13 +16,12 @@ import java.util.function.Predicate;
 /**
  * Created by VTM on 12/7/2016.
  */
-public class ProfitTracker {
+public class ProfitTracker extends StatisticsTracker {
 
   /* FIELDS */
 
   private Predicate<ItemEvent> predicate;
   private int totalProfit;
-  private StopWatch stopWatch;
   private Map<Integer, Integer> gePricesCache;
 
 
@@ -33,11 +32,12 @@ public class ProfitTracker {
 
     gePricesCache = new HashMap<>();
     totalProfit = 0;
-    stopWatch = new StopWatch();
   }
 
   @EventHandler
   public void onItemAdded(ItemAddedEvent itemAddedEvent) {
+    if (!isRunning()) return;
+
     ItemEvent itemEvent = itemAddedEvent.event;
 
     if (!predicate.test(itemEvent)) return;
@@ -53,6 +53,8 @@ public class ProfitTracker {
 
   @EventHandler
   public void onItemRemoved(ItemRemovedEvent itemRemovedEvent) {
+    if (!isRunning()) return;
+
     ItemEvent itemEvent = itemRemovedEvent.event;
 
     if (!predicate.test(itemEvent)) return;
@@ -65,21 +67,10 @@ public class ProfitTracker {
     totalProfit -= itemPrice * itemEvent.getQuantityChange();
   }
 
-  public void start() {
-    stopWatch.start();
-  }
-
-  public void stop() {
-    stopWatch.stop();
-  }
-
+  @Override
   public void reset() {
-    stopWatch.reset();
+    super.reset();
     totalProfit = 0;
-  }
-
-  public long getRunningTime() {
-    return stopWatch.getRuntime();
   }
 
   public int getTotalProfit() {
@@ -90,11 +81,4 @@ public class ProfitTracker {
     return (int) ((getTotalProfit() * 3600000D) / getRunningTime());
   }
 
-  @EventHandler
-  public void StartTasksEventHandler(StartTasksEvent event) {
-    start();
-  }
-
-  @EventHandler
-  public void StopTasksEventHandler(StopTasksEvent event) { stop(); }
 }

@@ -14,7 +14,7 @@ public class TaskBot extends LoopingBot {
 
   /* FIELDS */
 
-  private final EventDispatcher dispatcher;
+  private EventDispatcher dispatcher;
   private Logger logger;
   private Task mainTask;
 
@@ -27,35 +27,40 @@ public class TaskBot extends LoopingBot {
     return (TaskBot) Environment.getBot();
   }
 
-  public TaskBot() {
-    // 1. Call super constructor
-    super();
+  @Override
+  public void onStart(String... strings) {
+    // 1. Initialize fields
 
-    // 2. Initialize fields
-    logger = new Logger();
+    // 1.1 Initialize logger
+    if (logger == null) {
+      if (Environment.isSDK()) {
+        logger = new Logger(Logger.Level.All);
+      } else {
+        logger = new Logger();
+      }
+    }
+
+    Logger.info("Starting bot.");
+
     runtimeStopWatch = new StopWatch();
     dispatcher = new EventDispatcher();
+
+    // 2. Dispatch start event
+    dispatcher.publish(new StartBotEvent());
+
+    // 2. Call super's method
+    super.onStart(strings);
   }
 
   @Override
   public void onLoop() {
     if (tasksRunning) {
       if (mainTask.validate()) {
-        Logger.debug("Executing MainTask.");
+        Logger.debug("Executing Main Task.");
+
         mainTask.execute();
       }
     }
-  }
-
-  @Override
-  public void onStart(String... strings) {
-    Logger.info("Starting bot.");
-
-    // 1. Dispatch start event
-    dispatcher.publish(new StartBotEvent());
-
-    // 2. Call super's method
-    super.onStart(strings);
   }
 
   @Override
@@ -167,6 +172,10 @@ public class TaskBot extends LoopingBot {
     return logger;
   }
 
+  public void setLogger(Logger logger) {
+    this.logger = logger;
+  }
+
   public Task getMainTask() {
     return mainTask;
   }
@@ -187,6 +196,4 @@ public class TaskBot extends LoopingBot {
     return runtimeStopWatch.getRuntimeAsString();
   }
 
-  // HACK: necessary for RuneMate to import the EventHandler interface.
-  private static final Dummy __dummy__ = new Dummy();
 }
